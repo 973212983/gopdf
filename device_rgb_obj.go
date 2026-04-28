@@ -11,6 +11,15 @@ type DeviceRGBObj struct {
 	getRoot func() *GoPdf
 }
 
+func (o DeviceRGBObj) clone(f func() *GoPdf) IObj {
+	cl := DeviceRGBObj{
+		data:    make([]byte, len(o.data)),
+		getRoot: f,
+	}
+	copy(cl.data, o.data)
+	return &cl
+}
+
 func (d *DeviceRGBObj) init(funcGetRoot func() *GoPdf) {
 	d.getRoot = funcGetRoot
 }

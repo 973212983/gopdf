@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/signintech/gopdf/fontmaker/core"
+	"github.com/973212983/gopdf/fontmaker/core"
 )
 
 // ErrCharNotFound char not found
@@ -26,6 +26,23 @@ type SubsetFontObj struct {
 	funcKernOverride      FuncKernOverride
 	funcGetRoot           func() *GoPdf
 	addCharsBuff          []rune
+}
+
+func (o SubsetFontObj) clone(f func() *GoPdf) IObj {
+	cl := SubsetFontObj{
+		ttfp:                  o.ttfp.Clone(),
+		Family:                o.Family,
+		CharacterToGlyphIndex: o.CharacterToGlyphIndex.Clone(),
+		CountOfFont:           o.CountOfFont,
+		indexObjCIDFont:       o.indexObjCIDFont,
+		indexObjUnicodeMap:    o.indexObjUnicodeMap,
+		ttfFontOption:         o.ttfFontOption,
+		funcKernOverride:      o.funcKernOverride, // 直接赋值，可能有风险
+		funcGetRoot:           f,
+		addCharsBuff:          make([]rune, len(o.addCharsBuff)),
+	}
+	copy(cl.addCharsBuff, o.addCharsBuff)
+	return &cl
 }
 
 func (s *SubsetFontObj) init(funcGetRoot func() *GoPdf) {

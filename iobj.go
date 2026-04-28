@@ -9,4 +9,5 @@ type IObj interface {
 	init(func() *GoPdf)
 	getType() string
 	write(w io.Writer, objID int) error
+	clone(f func() *GoPdf) IObj
 }

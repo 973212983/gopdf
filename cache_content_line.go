@@ -14,6 +14,17 @@ type cacheContentLine struct {
 	opts       lineOptions
 }
 
+func (c *cacheContentLine) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentLine)
+	cl.pageHeight = c.pageHeight
+	cl.x1 = c.x1
+	cl.y1 = c.y1
+	cl.y2 = c.y2
+	cl.x2 = c.x2
+	cl.opts = c.opts.Clone()
+	return cl
+}
+
 func (c *cacheContentLine) write(w io.Writer, protection *PDFProtection) error {
 	fmt.Fprintf(w, "q\n")
 	for _, extGStateIndex := range c.opts.extGStateIndexes {

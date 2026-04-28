@@ -152,8 +152,115 @@ type lineOptions struct {
 	extGStateIndexes []int
 }
 
+func (c lineOptions) Clone() lineOptions {
+	cl := lineOptions{
+		extGStateIndexes: make([]int, len(c.extGStateIndexes)),
+	}
+	copy(cl.extGStateIndexes, c.extGStateIndexes)
+	return cl
+}
+
 type polygonOptions struct {
 	extGStateIndexes []int
+}
+
+func (c polygonOptions) Clone() polygonOptions {
+	cl := polygonOptions{
+		extGStateIndexes: make([]int, len(c.extGStateIndexes)),
+	}
+	copy(cl.extGStateIndexes, c.extGStateIndexes)
+	return cl
+}
+
+func (gp *GoPdf) Clone() *GoPdf {
+	gpCl := new(GoPdf)
+	f := func() *GoPdf {
+		return gpCl
+	}
+	gpCl.margins = gp.margins
+	gpCl.pdfObjs = make([]IObj, len(gp.pdfObjs))
+	for i, obj := range gp.pdfObjs {
+		gpCl.pdfObjs[i] = obj.clone(f)
+	}
+	gpCl.config = gp.config
+	gpCl.anchors = make(map[string]anchorOption)
+	for k, v := range gp.anchors {
+		gpCl.anchors[k] = v
+	}
+	gpCl.indexOfCatalogObj = gp.indexOfCatalogObj
+	gpCl.indexOfPagesObj = gp.indexOfPagesObj
+	gpCl.numOfPagesObj = gp.numOfPagesObj
+	gpCl.indexOfFirstPageObj = gp.indexOfFirstPageObj
+	curr := gp.curr.Clone(f)
+	gpCl.curr = *curr
+	gpCl.indexEncodingObjFonts = make([]int, len(gp.indexEncodingObjFonts))
+	copy(gpCl.indexEncodingObjFonts, gp.indexEncodingObjFonts)
+	// After cloning, restore *SubsetFontObj sharing across each font group.
+	for _, obj := range gpCl.pdfObjs {
+		subFont, ok := obj.(*SubsetFontObj)
+		if !ok {
+			continue
+		}
+		if cidFontObj, ok2 := gpCl.pdfObjs[subFont.indexObjCIDFont].(*CIDFontObj); ok2 {
+			cidFontObj.PtrToSubsetFontObj = subFont
+			if subfontDescObj, ok3 := gpCl.pdfObjs[cidFontObj.indexObjSubfontDescriptor].(*SubfontDescriptorObj); ok3 {
+				subfontDescObj.PtrToSubsetFontObj = subFont
+				if pdfDictObj, ok4 := gpCl.pdfObjs[subfontDescObj.indexObjPdfDictionary].(*PdfDictionaryObj); ok4 {
+					pdfDictObj.PtrToSubsetFontObj = subFont
+				}
+			}
+		}
+		if unicodeMap, ok2 := gpCl.pdfObjs[subFont.indexObjUnicodeMap].(*UnicodeMap); ok2 {
+			unicodeMap.PtrToSubsetFontObj = subFont
+		}
+	}
+	// Rewire curr.FontISubset to the canonical SubsetFontObj in pdfObjs.
+	if gpCl.curr.FontISubset != nil {
+		for _, obj := range gpCl.pdfObjs {
+			if subFont, ok := obj.(*SubsetFontObj); ok &&
+				subFont.CountOfFont == gpCl.curr.FontISubset.CountOfFont {
+				gpCl.curr.FontISubset = subFont
+				break
+			}
+		}
+	}
+	gpCl.indexOfContent = gp.indexOfContent
+	gpCl.indexOfProcSet = gp.indexOfProcSet
+	// 仅复制未读部分
+	gpCl.buf.Write(gp.buf.Bytes())
+	if gp.pdfProtection != nil {
+		gpCl.pdfProtection = gp.pdfProtection.Clone()
+	}
+	gpCl.encryptionObjID = gp.encryptionObjID
+	gpCl.compressLevel = gp.compressLevel
+	gpCl.isUseInfo = gp.isUseInfo
+	if gp.info != nil {
+		gpCl.info = &PdfInfo{
+			Title:        gp.info.Title,
+			Author:       gp.info.Author,
+			Subject:      gp.info.Subject,
+			Creator:      gp.info.Creator,
+			Producer:     gp.info.Producer,
+			CreationDate: time.Now(), //时间不克隆
+		}
+	}
+
+	gpCl.indexOfOutlinesObj = gp.indexOfOutlinesObj
+	if gpCl.indexOfOutlinesObj >= 0 {
+		gpCl.outlines = gpCl.pdfObjs[gpCl.indexOfOutlinesObj].(*OutlinesObj)
+	}
+	// 赋值func高风险,先不复制
+	//gpCl.headerFunc = gp.headerFunc
+	//gpCl.footerFunc = gp.footerFunc
+	// 这是用于导入的类，先不管
+	//gpCl.fpdi
+	// 该类较深，复制麻烦，目前用不上，先不管
+	//gpCl.placeHolderTexts = make(map[string][]placeHolderTextInfo)
+	//for k, v := range gp.placeHolderTexts {
+	//	gpCl.placeHolderTexts[k] = make([]placeHolderTextInfo, len(v))
+	//	copy(gpCl.placeHolderTexts[k], v)
+	//}
+	return gpCl
 }
 
 // SetLineWidth : set line width
@@ -2007,30 +2114,6 @@ func (gp *GoPdf) Polygon(points []Point, style string) {
 		pointReals = append(pointReals, Point{X: x, Y: y})
 	}
 	gp.getContent().AppendStreamPolygon(pointReals, style, opts)
-}
-
-// ClipPolygon sets a clipping path from polygon points.
-func (gp *GoPdf) ClipPolygon(points []Point) {
-	var pointReals []Point
-	for _, p := range points {
-		x := p.X
-		y := p.Y
-		gp.UnitsToPointsVar(&x, &y)
-		pointReals = append(pointReals, Point{X: x, Y: y})
-	}
-	gp.getContent().AppendStreamClipPolygon(pointReals)
-}
-
-// SaveGraphicsState saves the current graphics state.
-// Use with RestoreGraphicsState to scope clipping paths and transformations.
-func (gp *GoPdf) SaveGraphicsState() {
-	gp.getContent().AppendStreamSaveGraphicsState()
-}
-
-// RestoreGraphicsState restores a previously saved graphics state.
-// Clipping paths and transformations are reset to the saved state.
-func (gp *GoPdf) RestoreGraphicsState() {
-	gp.getContent().AppendStreamRestoreGraphicsState()
 }
 
 // Rectangle : draw rectangle, and add radius input to make a round corner, it helps to calculate the round corner coordinates and use Polygon functions to draw rectangle

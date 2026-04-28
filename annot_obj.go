@@ -26,6 +26,14 @@ func (o annotObj) write(w io.Writer, objID int) error {
 	}
 }
 
+func (o annotObj) clone(f func() *GoPdf) IObj {
+	cl := annotObj{
+		linkOption: o.linkOption,
+		GetRoot:    f,
+	}
+	return &cl
+}
+
 func (o annotObj) writeExternalLink(w io.Writer, l linkOption, objID int) error {
 	protection := o.GetRoot().protection()
 	url := l.url

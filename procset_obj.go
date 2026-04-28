@@ -16,6 +16,25 @@ type ProcSetObj struct {
 	getRoot             func() *GoPdf
 }
 
+func (o ProcSetObj) clone(f func() *GoPdf) IObj {
+	cl := ProcSetObj{
+		Relates:             make(RelateFonts, len(o.Relates)),
+		RelateColorSpaces:   make(RelateColorSpaces, len(o.RelateColorSpaces)),
+		RelateXobjs:         make(RelateXobjects, len(o.RelateXobjs)),
+		ExtGStates:          make([]ExtGS, len(o.ExtGStates)),
+		ImportedTemplateIds: make(map[string]int),
+		getRoot:             f,
+	}
+	copy(cl.Relates, o.Relates)
+	copy(cl.RelateColorSpaces, o.RelateColorSpaces)
+	copy(cl.RelateXobjs, o.RelateXobjs)
+	copy(cl.ExtGStates, o.ExtGStates)
+	for k, v := range o.ImportedTemplateIds {
+		cl.ImportedTemplateIds[k] = v
+	}
+	return &cl
+}
+
 func (pr *ProcSetObj) init(funcGetRoot func() *GoPdf) {
 	pr.getRoot = funcGetRoot
 	pr.ImportedTemplateIds = make(map[string]int, 0)

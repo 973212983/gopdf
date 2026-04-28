@@ -15,6 +15,8 @@ type IFont interface {
 
 	SetFamily(family string)
 	GetFamily() string
+
+	Clone() IFont
 }
 
 // FontCw maps characters to integers.

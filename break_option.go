@@ -34,6 +34,15 @@ type BreakOption struct {
 	Separator string
 }
 
+func (bo BreakOption) Clone() BreakOption {
+	cl := BreakOption{
+		Mode:           bo.Mode,
+		BreakIndicator: bo.BreakIndicator,
+		Separator:      bo.Separator,
+	}
+	return cl
+}
+
 func (bo BreakOption) HasSeparator() bool {
 	return bo.Separator != ""
 }

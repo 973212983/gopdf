@@ -20,6 +20,20 @@ type FontObj struct {
 	CountOfFont int
 }
 
+func (o FontObj) clone(f func() *GoPdf) IObj {
+	cl := FontObj{
+		Family:                 o.Family,
+		IsEmbedFont:            o.IsEmbedFont,
+		indexObjWidth:          o.indexObjWidth,
+		indexObjFontDescriptor: o.indexObjFontDescriptor,
+		indexObjEncoding:       o.indexObjEncoding,
+
+		Font:        o.Font.Clone(), // 可能有风险
+		CountOfFont: o.CountOfFont,
+	}
+	return &cl
+}
+
 func (f *FontObj) init(funcGetRoot func() *GoPdf) {
 	f.IsEmbedFont = false
 	//me.CountOfFont = -1

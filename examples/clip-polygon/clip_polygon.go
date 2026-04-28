@@ -1,7 +1,7 @@
 package clip_polygon
 
 import (
-	"github.com/signintech/gopdf"
+	"github.com/973212983/gopdf"
 )
 
 func ClipPolygonExample() error {

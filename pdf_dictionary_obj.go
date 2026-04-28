@@ -7,7 +7,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/signintech/gopdf/fontmaker/core"
+	"github.com/973212983/gopdf/fontmaker/core"
 )
 
 // EntrySelectors entry selectors
@@ -27,6 +27,14 @@ type PdfDictionaryObj struct {
 	PtrToSubsetFontObj *SubsetFontObj
 	//getRoot            func() *GoPdf
 	pdfProtection *PDFProtection
+}
+
+func (o PdfDictionaryObj) clone(f func() *GoPdf) IObj {
+	cl := PdfDictionaryObj{
+		PtrToSubsetFontObj: o.PtrToSubsetFontObj.clone(f).(*SubsetFontObj),
+		pdfProtection:      o.pdfProtection.Clone(),
+	}
+	return &cl
 }
 
 func (p *PdfDictionaryObj) init(funcGetRoot func() *GoPdf) {

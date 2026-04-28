@@ -15,12 +15,25 @@ type cacheContentRectangle struct {
 	extGStateIndexes []int
 }
 
+func (c *cacheContentRectangle) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentRectangle)
+	cl.pageHeight = c.pageHeight
+	cl.x = c.x
+	cl.y = c.y
+	cl.width = c.width
+	cl.height = c.height
+	cl.extGStateIndexes = make([]int, len(c.extGStateIndexes))
+	copy(cl.extGStateIndexes, c.extGStateIndexes)
+	cl.style = c.style
+	return cl
+}
+
 func NewCacheContentRectangle(pageHeight float64, rectOpts DrawableRectOptions) ICacheContent {
 	if rectOpts.PaintStyle == "" {
 		rectOpts.PaintStyle = DrawPaintStyle
 	}
 
-	return cacheContentRectangle{
+	return &cacheContentRectangle{
 		x:                rectOpts.X,
 		y:                rectOpts.Y,
 		width:            rectOpts.W,

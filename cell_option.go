@@ -28,3 +28,25 @@ type CellOption struct {
 
 	extGStateIndexes []int
 }
+
+func (c CellOption) Clone() CellOption {
+	cl := CellOption{
+		Align:                  c.Align,
+		Border:                 c.Border,
+		Float:                  c.Float,
+		CoefUnderlinePosition:  c.CoefUnderlinePosition,
+		CoefLineHeight:         c.CoefLineHeight,
+		CoefUnderlineThickness: c.CoefUnderlineThickness,
+		extGStateIndexes:       make([]int, len(c.extGStateIndexes)),
+	}
+	copy(cl.extGStateIndexes, c.extGStateIndexes)
+	if c.Transparency != nil {
+		tr := c.Transparency.Clone()
+		cl.Transparency = &tr
+	}
+	if c.BreakOption != nil {
+		br := c.BreakOption.Clone()
+		cl.BreakOption = &br
+	}
+	return cl
+}

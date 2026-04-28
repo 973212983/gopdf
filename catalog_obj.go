@@ -31,6 +31,13 @@ func (c *CatalogObj) write(w io.Writer, objID int) error {
 	return nil
 }
 
+func (o *CatalogObj) clone(f func() *GoPdf) IObj {
+	cl := CatalogObj{
+		outlinesObjID: o.outlinesObjID,
+	}
+	return &cl
+}
+
 func (c *CatalogObj) SetIndexObjOutlines(index int) {
 	c.outlinesObjID = index + 1
 }

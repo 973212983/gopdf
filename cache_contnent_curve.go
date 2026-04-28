@@ -18,6 +18,21 @@ type cacheContentCurve struct {
 	style      string
 }
 
+func (c *cacheContentCurve) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentCurve)
+	cl.pageHeight = c.pageHeight
+	cl.x0 = c.x0
+	cl.y0 = c.y0
+	cl.x1 = c.x1
+	cl.y1 = c.y1
+	cl.x2 = c.x2
+	cl.y2 = c.y2
+	cl.x3 = c.x3
+	cl.y3 = c.y3
+	cl.style = c.style
+	return cl
+}
+
 func (c *cacheContentCurve) write(w io.Writer, protection *PDFProtection) error {
 
 	h := c.pageHeight

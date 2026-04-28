@@ -17,6 +17,21 @@ type ExtGState struct {
 	SMaskIndex *int
 }
 
+func (o ExtGState) clone(f func() *GoPdf) IObj {
+	ca := *o.ca
+	cA := *o.CA
+	BM := *o.BM
+	sMaskIndex := *o.SMaskIndex
+	cl := ExtGState{
+		Index:      o.Index,
+		ca:         &ca,
+		CA:         &cA,
+		BM:         &BM,
+		SMaskIndex: &sMaskIndex,
+	}
+	return &cl
+}
+
 type ExtGStateOptions struct {
 	StrokingCA    *float64
 	NonStrokingCa *float64
@@ -113,6 +128,15 @@ func NewExtGStatesMap() ExtGStatesMap {
 		syncer: sync.Mutex{},
 		table:  make(map[string]ExtGState),
 	}
+}
+
+func (extm *ExtGStatesMap) Clone(f func() *GoPdf) *ExtGStatesMap {
+	cl := NewExtGStatesMap()
+	for k, v := range extm.table {
+		m := v.clone(f).(*ExtGState)
+		cl.table[k] = *m
+	}
+	return &cl
 }
 
 func (extm *ExtGStatesMap) Find(extGState ExtGStateOptions) (ExtGState, bool) {

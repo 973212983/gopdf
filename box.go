@@ -5,6 +5,20 @@ type Box struct {
 	unitOverride             defaultUnitConfig
 }
 
+func (box *Box) Clone() *Box {
+	if box == nil {
+		return nil
+	}
+	cl := Box{
+		Left:         box.Left,
+		Top:          box.Top,
+		Right:        box.Right,
+		Bottom:       box.Bottom,
+		unitOverride: box.unitOverride,
+	}
+	return &cl
+}
+
 // UnitsToPoints converts the box coordinates to Points. When this is called it is assumed the values of the box are in Units
 func (box *Box) UnitsToPoints(t int) (b *Box) {
 	if box == nil {

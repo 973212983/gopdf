@@ -11,6 +11,14 @@ type FontDescriptorObj struct {
 	fontFileObjRelate string
 }
 
+func (o FontDescriptorObj) clone(f func() *GoPdf) FontDescriptorObj {
+	cl := FontDescriptorObj{
+		font:              o.font, // 可能有风险
+		fontFileObjRelate: o.fontFileObjRelate,
+	}
+	return cl
+}
+
 func (f *FontDescriptorObj) init(funcGetRoot func() *GoPdf) {
 
 }

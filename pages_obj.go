@@ -12,6 +12,15 @@ type PagesObj struct { //impl IObj
 	getRoot   func() *GoPdf
 }
 
+func (o PagesObj) clone(f func() *GoPdf) IObj {
+	cl := PagesObj{
+		PageCount: o.PageCount,
+		Kids:      o.Kids,
+		getRoot:   f,
+	}
+	return &cl
+}
+
 func (p *PagesObj) init(funcGetRoot func() *GoPdf) {
 	p.PageCount = 0
 	p.getRoot = funcGetRoot

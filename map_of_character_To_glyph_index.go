@@ -7,6 +7,20 @@ type MapOfCharacterToGlyphIndex struct {
 	Vals      []uint
 }
 
+func (m *MapOfCharacterToGlyphIndex) Clone() *MapOfCharacterToGlyphIndex {
+	cl := MapOfCharacterToGlyphIndex{
+		keyIndexs: make(map[rune]int),
+		Keys:      make([]rune, len(m.Keys)),
+		Vals:      make([]uint, len(m.Vals)),
+	}
+	for k, v := range m.keyIndexs {
+		cl.keyIndexs[k] = v
+	}
+	copy(cl.Keys, m.Keys)
+	copy(cl.Vals, m.Vals)
+	return &cl
+}
+
 // NewMapOfCharacterToGlyphIndex new CharacterToGlyphIndex
 func NewMapOfCharacterToGlyphIndex() *MapOfCharacterToGlyphIndex {
 	var m MapOfCharacterToGlyphIndex

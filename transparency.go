@@ -59,6 +59,16 @@ func (t Transparency) GetId() string {
 	return keyStr
 }
 
+func (t Transparency) Clone() Transparency {
+	cl := Transparency{
+		Alpha:          t.Alpha,
+		BlendModeType:  t.BlendModeType,
+		extGStateIndex: t.extGStateIndex,
+	}
+
+	return cl
+}
+
 type TransparencyMap struct {
 	syncer sync.Mutex
 	table  map[string]Transparency
@@ -69,6 +79,14 @@ func NewTransparencyMap() TransparencyMap {
 		syncer: sync.Mutex{},
 		table:  make(map[string]Transparency),
 	}
+}
+
+func (tm *TransparencyMap) Clone(f func() *GoPdf) *TransparencyMap {
+	cl := NewTransparencyMap()
+	for k, v := range tm.table {
+		cl.table[k] = v.Clone()
+	}
+	return &cl
 }
 
 func (tm *TransparencyMap) Find(transparency Transparency) (Transparency, bool) {

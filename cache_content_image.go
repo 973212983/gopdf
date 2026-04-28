@@ -20,6 +20,28 @@ type cacheContentImage struct {
 	extGStateIndexes []int
 }
 
+func (c *cacheContentImage) Clone(f func() *GoPdf) ICacheContent {
+	cl := &cacheContentImage{
+		withMask:         c.withMask,
+		maskAngle:        c.maskAngle,
+		imageAngle:       c.imageAngle,
+		verticalFlip:     c.verticalFlip,
+		horizontalFlip:   c.horizontalFlip,
+		index:            c.index,
+		x:                c.x,
+		y:                c.y,
+		pageHeight:       c.pageHeight,
+		rect:             *c.rect.Clone(),
+		extGStateIndexes: make([]int, len(c.extGStateIndexes)),
+	}
+	if c.crop != nil {
+		clCrop := *c.crop
+		cl.crop = &clCrop
+	}
+	copy(cl.extGStateIndexes, c.extGStateIndexes)
+	return cl
+}
+
 func (c *cacheContentImage) openImageRotateTrMt(writer io.Writer, protection *PDFProtection) error {
 	w := c.rect.W
 	h := c.rect.H

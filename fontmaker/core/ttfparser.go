@@ -82,6 +82,77 @@ type TTFParser struct {
 var Symbolic = 1 << 2
 var Nonsymbolic = (1 << 5)
 
+func (t *TTFParser) Clone() TTFParser {
+	cl := TTFParser{
+		tables:             make(map[string]TableDirectoryEntry),
+		unitsPerEm:         t.unitsPerEm,
+		xMin:               t.xMin,
+		yMin:               t.yMin,
+		xMax:               t.xMax,
+		yMax:               t.yMax,
+		indexToLocFormat:   t.indexToLocFormat,
+		numberOfHMetrics:   t.numberOfHMetrics,
+		ascender:           t.ascender,
+		descender:          t.descender,
+		numGlyphs:          t.numGlyphs,
+		widths:             make([]uint, len(t.widths)),
+		chars:              make(map[int]uint),
+		postScriptName:     t.postScriptName,
+		os2Version:         t.os2Version,
+		Embeddable:         t.Embeddable,
+		Bold:               t.Bold,
+		typoAscender:       t.typoAscender,
+		typoDescender:      t.typoDescender,
+		capHeight:          t.capHeight,
+		sxHeight:           t.sxHeight,
+		italicAngle:        t.italicAngle,
+		underlinePosition:  t.underlinePosition,
+		underlineThickness: t.underlineThickness,
+		isFixedPitch:       t.isFixedPitch,
+		sTypoLineGap:       t.sTypoLineGap,
+		usWinAscent:        t.usWinAscent,
+		usWinDescent:       t.usWinDescent,
+		IsShortIndex:       t.IsShortIndex,
+		LocaTable:          make([]uint, len(t.LocaTable)),
+		SegCount:           t.SegCount,
+		StartCount:         make([]uint, len(t.StartCount)),
+		EndCount:           make([]uint, len(t.EndCount)),
+		IdRangeOffset:      make([]uint, len(t.IdRangeOffset)),
+		IdDelta:            make([]uint, len(t.IdDelta)),
+		GlyphIdArray:       make([]uint, len(t.GlyphIdArray)),
+		symbol:             t.symbol,
+		groupingTables:     make([]CmapFormat12GroupingTable, len(t.groupingTables)),
+		cachedFontData:     make([]byte, len(t.cachedFontData)),
+		useKerning:         t.useKerning,
+	}
+	if t.kern != nil {
+		cl.kern = &KernTable{
+			Version: t.kern.Version,
+			NTables: t.kern.NTables,
+			Kerning: make(KernMap),
+		}
+		for k, v := range t.kern.Kerning {
+			cl.kern.Kerning[k] = v
+		}
+	}
+	for k, v := range t.tables {
+		cl.tables[k] = v
+	}
+	copy(cl.widths, t.widths)
+	for k, v := range t.chars {
+		cl.chars[k] = v
+	}
+	copy(cl.cachedFontData, t.cachedFontData)
+	copy(cl.LocaTable, t.LocaTable)
+	copy(cl.StartCount, t.StartCount)
+	copy(cl.EndCount, t.EndCount)
+	copy(cl.IdRangeOffset, t.IdRangeOffset)
+	copy(cl.IdDelta, t.IdDelta)
+	copy(cl.GlyphIdArray, t.GlyphIdArray)
+	copy(cl.groupingTables, t.groupingTables)
+	return cl
+}
+
 // Kern get KernTable
 func (t *TTFParser) Kern() *KernTable {
 	return t.kern

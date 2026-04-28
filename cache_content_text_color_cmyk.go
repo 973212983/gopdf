@@ -22,3 +22,21 @@ func (c cacheContentTextColorCMYK) equal(obj ICacheColorText) bool {
 
 	return c.c == cmyk.c && c.m == cmyk.m && c.y == cmyk.y && c.k == cmyk.k
 }
+
+func (c cacheContentTextColorCMYK) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentTextColorCMYK)
+	cl.c = c.c
+	cl.m = c.m
+	cl.y = c.y
+	cl.k = c.k
+	return *cl
+}
+
+func (c cacheContentTextColorCMYK) CloneText() ICacheColorText {
+	cl := new(cacheContentTextColorCMYK)
+	cl.c = c.c
+	cl.m = c.m
+	cl.y = c.y
+	cl.k = c.k
+	return *cl
+}

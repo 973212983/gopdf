@@ -44,6 +44,35 @@ type cacheContentText struct {
 	isPlaceHolder                      bool
 }
 
+func (c *cacheContentText) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentText)
+	cl.rectangle = c.rectangle.Clone()
+	if c.textColor != nil {
+		cl.textColor = c.textColor.CloneText()
+	}
+	cl.grayFill = c.grayFill
+	cl.txtColorMode = c.txtColorMode
+	cl.fontCountIndex = c.fontCountIndex
+	cl.fontSize = c.fontSize
+	cl.fontStyle = c.fontStyle
+	cl.charSpacing = c.charSpacing
+	cl.setXCount = c.setXCount
+	cl.x = c.x
+	cl.y = c.y
+	if c.fontSubset != nil {
+		cl.fontSubset = c.fontSubset.clone(f).(*SubsetFontObj)
+	}
+	cl.pageheight = c.pageheight
+	cl.contentType = c.contentType
+	cl.cellOpt = c.cellOpt.Clone()
+	cl.lineWidth = c.lineWidth
+	cl.text = c.text
+	cl.cellWidthPdfUnit = c.cellWidthPdfUnit
+	cl.textWidthPdfUnit = c.textWidthPdfUnit
+	cl.isPlaceHolder = c.isPlaceHolder
+	return cl
+}
+
 func (c *cacheContentText) isSame(cache cacheContentText) bool {
 	if c.rectangle != nil {
 		//if rectangle != nil we assume this is not same content

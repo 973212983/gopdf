@@ -12,6 +12,16 @@ type cacheContentPolygon struct {
 	opts       polygonOptions
 }
 
+func (c *cacheContentPolygon) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentPolygon)
+	cl.pageHeight = c.pageHeight
+	cl.style = c.style
+	cl.points = make([]Point, len(c.points))
+	copy(cl.points, c.points)
+	cl.opts = c.opts.Clone()
+	return cl
+}
+
 func (c *cacheContentPolygon) write(w io.Writer, protection *PDFProtection) error {
 
 	fmt.Fprintf(w, "q\n")

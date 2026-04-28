@@ -14,6 +14,19 @@ type ContentObj struct { //impl IObj
 	getRoot func() *GoPdf
 }
 
+func (o ContentObj) clone(f func() *GoPdf) IObj {
+	cl := ContentObj{
+		getRoot: f,
+	}
+	for _, item := range o.listCache.caches {
+		if item == nil {
+			continue
+		}
+		cl.listCache.caches = append(cl.listCache.caches, item.Clone(f))
+	}
+	return &cl
+}
+
 func (c *ContentObj) protection() *PDFProtection {
 	return c.getRoot().protection()
 }
@@ -420,24 +433,6 @@ func (c *ContentObj) AppendStreamPolygon(points []Point, style string, opts poly
 	cache.pageHeight = c.getRoot().curr.pageSize.H
 	cache.opts = opts
 	c.listCache.append(&cache)
-}
-
-// AppendStreamClipPolygon sets a clipping path from polygon points.
-func (c *ContentObj) AppendStreamClipPolygon(points []Point) {
-	var cache cacheContentClipPolygon
-	cache.points = points
-	cache.pageHeight = c.getRoot().curr.pageSize.H
-	c.listCache.append(&cache)
-}
-
-// AppendStreamSaveGraphicsState saves the current graphics state (q operator).
-func (c *ContentObj) AppendStreamSaveGraphicsState() {
-	c.listCache.append(&cacheContentSaveGraphicsState{})
-}
-
-// AppendStreamRestoreGraphicsState restores the graphics state (Q operator).
-func (c *ContentObj) AppendStreamRestoreGraphicsState() {
-	c.listCache.append(&cacheContentRestoreGraphicsState{})
 }
 
 func (c *ContentObj) appendRotate(angle, x, y float64) {

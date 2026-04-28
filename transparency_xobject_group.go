@@ -38,6 +38,23 @@ func GetCachedTransparencyXObjectGroup(opts TransparencyXObjectGroupOptions, gp 
 	return group, nil
 }
 
+func (o TransparencyXObjectGroup) clone(f func() *GoPdf) IObj {
+	cl := TransparencyXObjectGroup{
+		Index:            o.Index,
+		BBox:             o.BBox,
+		Matrix:           o.Matrix,
+		ExtGStateIndexes: make([]int, len(o.ExtGStateIndexes)),
+		XObjects:         make([]cacheContentImage, len(o.XObjects)),
+		getRoot:          f,
+		pdfProtection:    o.pdfProtection.Clone(),
+	}
+	copy(cl.ExtGStateIndexes, o.ExtGStateIndexes)
+	for i, v := range o.XObjects {
+		cl.XObjects[i] = *v.Clone(f).(*cacheContentImage)
+	}
+	return &cl
+}
+
 func (s TransparencyXObjectGroup) init(funcGetRoot func() *GoPdf) {
 	s.getRoot = funcGetRoot
 }

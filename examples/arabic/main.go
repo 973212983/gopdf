@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/signintech/gopdf"
+	"github.com/973212983/gopdf"
 )
 
 func main() {

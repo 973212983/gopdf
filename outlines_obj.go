@@ -16,6 +16,20 @@ type OutlinesObj struct { //impl IObj
 	lastObj *OutlineObj
 }
 
+func (o OutlinesObj) clone(f func() *GoPdf) IObj {
+	cl := OutlinesObj{
+		getRoot: f,
+		index:   o.index,
+		first:   o.first,
+		last:    o.last,
+		count:   o.count,
+	}
+	if o.lastObj != nil {
+		cl.lastObj = o.lastObj.clone(f).(*OutlineObj)
+	}
+	return &cl
+}
+
 func (o *OutlinesObj) init(funcGetRoot func() *GoPdf) {
 	o.getRoot = funcGetRoot
 	o.first = -1
@@ -96,6 +110,21 @@ type OutlineObj struct { //impl IObj
 	first  int
 	last   int
 	height float64
+}
+
+func (o OutlineObj) clone(f func() *GoPdf) IObj {
+	cl := OutlineObj{
+		title:  o.title,
+		index:  o.index,
+		dest:   o.dest,
+		parent: o.parent,
+		prev:   o.prev,
+		next:   o.next,
+		first:  o.first,
+		last:   o.last,
+		height: o.height,
+	}
+	return &cl
 }
 
 func (o *OutlineObj) init(funcGetRoot func() *GoPdf) {

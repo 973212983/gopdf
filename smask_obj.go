@@ -24,6 +24,19 @@ type SMask struct {
 	S                             string
 }
 
+func (o SMask) clone(f func() *GoPdf) IObj {
+	cl := SMask{
+		imgInfo:                       o.imgInfo.Clone(),
+		data:                          make([]byte, len(o.data)),
+		pdfProtection:                 o.pdfProtection.Clone(),
+		Index:                         o.Index,
+		TransparencyXObjectGroupIndex: o.TransparencyXObjectGroupIndex,
+		S:                             o.S,
+	}
+	copy(cl.data, o.data)
+	return &cl
+}
+
 type SMaskOptions struct {
 	TransparencyXObjectGroupIndex int
 	Subtype                       SMaskSubtypes
@@ -109,6 +122,15 @@ func NewSMaskMap() SMaskMap {
 		syncer: sync.Mutex{},
 		table:  make(map[string]SMask),
 	}
+}
+
+func (smask *SMaskMap) Clone(f func() *GoPdf) *SMaskMap {
+	cl := NewSMaskMap()
+	for k, v := range smask.table {
+		m := v.clone(f).(*SMask)
+		cl.table[k] = *m
+	}
+	return &cl
 }
 
 func (smask *SMaskMap) Find(sMask SMaskOptions) (SMask, bool) {

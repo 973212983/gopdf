@@ -4,13 +4,21 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/signintech/gopdf/fontmaker/core"
+	"github.com/973212983/gopdf/fontmaker/core"
 )
 
 // SubfontDescriptorObj pdf subfont descriptorObj object
 type SubfontDescriptorObj struct {
 	PtrToSubsetFontObj    *SubsetFontObj
 	indexObjPdfDictionary int
+}
+
+func (o SubfontDescriptorObj) clone(f func() *GoPdf) IObj {
+	cl := SubfontDescriptorObj{
+		PtrToSubsetFontObj:    o.PtrToSubsetFontObj.clone(f).(*SubsetFontObj),
+		indexObjPdfDictionary: o.indexObjPdfDictionary,
+	}
+	return &cl
 }
 
 func (s *SubfontDescriptorObj) init(func() *GoPdf) {}

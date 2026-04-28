@@ -7,6 +7,18 @@ type Rect struct {
 	unitOverride defaultUnitConfig
 }
 
+func (rect *Rect) Clone() *Rect {
+	if rect == nil {
+		return nil
+	}
+	cl := Rect{
+		W:            rect.W,
+		H:            rect.H,
+		unitOverride: rect.unitOverride,
+	}
+	return &cl
+}
+
 // PointsToUnits converts the rectangles width and height to Units. When this is called it is assumed the values of the rectangle are in Points
 func (rect *Rect) PointsToUnits(t int) (r *Rect) {
 	if rect == nil {

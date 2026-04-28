@@ -6,6 +6,14 @@ type PageOption struct {
 	PageSize *Rect
 }
 
+func (p PageOption) Clone() PageOption {
+	clone := PageOption{
+		TrimBox:  p.TrimBox.Clone(),
+		PageSize: p.PageSize.Clone(),
+	}
+	return clone
+}
+
 func (p PageOption) isEmpty() bool {
 	return p.PageSize == nil
 }

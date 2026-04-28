@@ -13,6 +13,13 @@ type cacheContentGray struct {
 	scale    float64
 }
 
+func (c *cacheContentGray) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentGray)
+	cl.grayType = c.grayType
+	cl.scale = c.scale
+	return cl
+}
+
 func (c *cacheContentGray) write(w io.Writer, protection *PDFProtection) error {
 	fmt.Fprintf(w, "%.2f %s\n", c.scale, c.grayType)
 	return nil

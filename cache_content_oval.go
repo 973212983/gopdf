@@ -13,6 +13,16 @@ type cacheContentOval struct {
 	y2         float64
 }
 
+func (c *cacheContentOval) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentOval)
+	cl.pageHeight = c.pageHeight
+	cl.x1 = c.x1
+	cl.y1 = c.y1
+	cl.x2 = c.x2
+	cl.y2 = c.y2
+	return cl
+}
+
 func (c *cacheContentOval) write(w io.Writer, protection *PDFProtection) error {
 
 	h := c.pageHeight

@@ -9,6 +9,13 @@ type EncodingObj struct {
 	font IFont
 }
 
+func (o EncodingObj) clone(f func() *GoPdf) IObj {
+	cl := EncodingObj{
+		font: o.font.Clone(), // 可能有并发/数据影响问题
+	}
+	return &cl
+}
+
 func (e *EncodingObj) init(funcGetRoot func() *GoPdf) {
 
 }

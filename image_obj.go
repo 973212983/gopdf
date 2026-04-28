@@ -26,6 +26,18 @@ type ImageObj struct {
 	//getRoot func() *GoPdf
 }
 
+func (o ImageObj) clone(f func() *GoPdf) IObj {
+	cl := ImageObj{
+		IsMask:        o.IsMask,
+		SplittedMask:  o.SplittedMask,
+		imginfo:       o.imginfo.Clone(),
+		pdfProtection: o.pdfProtection.Clone(),
+	}
+	reader := *o.rawImgReader // 共享数组应该不会修改
+	cl.rawImgReader = &reader
+	return &cl
+}
+
 func (i *ImageObj) init(funcGetRoot func() *GoPdf) {
 
 }

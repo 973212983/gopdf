@@ -13,6 +13,17 @@ type EncryptionObj struct {
 	pValue int    //P entry in pdf document
 }
 
+func (o EncryptionObj) clone(f func() *GoPdf) IObj {
+	cl := EncryptionObj{
+		uValue: make([]byte, len(o.uValue)),
+		oValue: make([]byte, len(o.oValue)),
+		pValue: o.pValue,
+	}
+	copy(cl.uValue, o.uValue)
+	copy(cl.oValue, o.oValue)
+	return &cl
+}
+
 func (e *EncryptionObj) init(func() *GoPdf) {
 
 }

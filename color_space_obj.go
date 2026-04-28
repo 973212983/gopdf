@@ -14,6 +14,18 @@ type ColorSpaceObj struct {
 	space             string
 }
 
+func (o ColorSpaceObj) clone(f func() *GoPdf) IObj {
+	cl := ColorSpaceObj{
+		CountOfSpaceColor: o.CountOfSpaceColor,
+		Name:              o.Name,
+		spaceName:         o.spaceName,
+		colorString0:      o.colorString0,
+		colorString1:      o.colorString1,
+		space:             o.space,
+	}
+	return &cl
+}
+
 func (cs *ColorSpaceObj) init(func() *GoPdf) {}
 
 func (cs *ColorSpaceObj) getType() string {

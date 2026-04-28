@@ -22,3 +22,19 @@ func (c cacheContentTextColorRGB) equal(obj ICacheColorText) bool {
 
 	return c.r == rgb.r && c.g == rgb.g && c.b == rgb.b
 }
+
+func (c cacheContentTextColorRGB) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentTextColorRGB)
+	cl.r = c.r
+	cl.g = c.g
+	cl.b = c.b
+	return cl
+}
+
+func (c cacheContentTextColorRGB) CloneText() ICacheColorText {
+	cl := new(cacheContentTextColorRGB)
+	cl.r = c.r
+	cl.g = c.g
+	cl.b = c.b
+	return cl
+}

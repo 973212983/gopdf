@@ -12,6 +12,16 @@ type cacheContentRotate struct {
 	angle, x, y float64
 }
 
+func (cc *cacheContentRotate) Clone(f func() *GoPdf) ICacheContent {
+	cl := new(cacheContentRotate)
+	cl.isReset = cc.isReset
+	cl.pageHeight = cc.pageHeight
+	cl.x = cc.x
+	cl.y = cc.y
+	cl.angle = cc.angle
+	return cl
+}
+
 func (cc *cacheContentRotate) write(w io.Writer, protection *PDFProtection) error {
 	if cc.isReset == true {
 		if _, err := io.WriteString(w, "Q\n"); err != nil {

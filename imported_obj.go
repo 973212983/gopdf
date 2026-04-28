@@ -9,6 +9,13 @@ type ImportedObj struct { //impl IObj
 	Data string
 }
 
+func (o *ImportedObj) clone(f func() *GoPdf) IObj {
+	cl := ImportedObj{
+		Data: o.Data,
+	}
+	return &cl
+}
+
 func (c *ImportedObj) init(funcGetRoot func() *GoPdf) {
 
 }

@@ -15,6 +15,18 @@ type PageObj struct { //impl IObj
 	getRoot         func() *GoPdf
 }
 
+func (o PageObj) clone(f func() *GoPdf) IObj {
+	cl := PageObj{
+		Contents:        o.Contents,
+		ResourcesRelate: o.ResourcesRelate,
+		pageOption:      o.pageOption.Clone(),
+		LinkObjIds:      make([]int, len(o.LinkObjIds)),
+		getRoot:         f,
+	}
+	copy(cl.LinkObjIds, o.LinkObjIds)
+	return &cl
+}
+
 func (p *PageObj) init(funcGetRoot func() *GoPdf) {
 	p.getRoot = funcGetRoot
 	p.LinkObjIds = make([]int, 0)

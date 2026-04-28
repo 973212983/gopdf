@@ -34,6 +34,29 @@ type PDFProtection struct {
 	encryptionKey []byte
 }
 
+func (p *PDFProtection) Clone() *PDFProtection {
+	if p == nil {
+		return nil
+	}
+	cl := &PDFProtection{
+		encrypted: p.encrypted,
+		pValue:    p.pValue,
+	}
+	if p.uValue != nil {
+		cl.uValue = make([]byte, len(p.uValue))
+		copy(cl.uValue, p.uValue)
+	}
+	if p.oValue != nil {
+		cl.oValue = make([]byte, len(p.oValue))
+		copy(cl.oValue, p.oValue)
+	}
+	if p.encryptionKey != nil {
+		cl.encryptionKey = make([]byte, len(p.encryptionKey))
+		copy(cl.encryptionKey, p.encryptionKey)
+	}
+	return cl
+}
+
 // SetProtection set protection information
 func (p *PDFProtection) SetProtection(permissions int, userPass []byte, ownerPass []byte) error {
 	return p.setProtection(permissions, userPass, ownerPass)

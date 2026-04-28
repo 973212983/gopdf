@@ -14,6 +14,16 @@ type EmbedFontObj struct {
 	getRoot   func() *GoPdf
 }
 
+func (o EmbedFontObj) clone(f func() *GoPdf) EmbedFontObj {
+	cl := EmbedFontObj{
+		Data:      o.Data,
+		zfontpath: o.zfontpath,
+		font:      o.font, // 应该没并发问题，直接赋值
+		getRoot:   f,
+	}
+	return cl
+}
+
 func (e *EmbedFontObj) init(funcGetRoot func() *GoPdf) {
 	e.getRoot = funcGetRoot
 }

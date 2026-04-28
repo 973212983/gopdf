@@ -12,6 +12,14 @@ type UnicodeMap struct {
 	pdfProtection *PDFProtection
 }
 
+func (o UnicodeMap) clone(f func() *GoPdf) IObj {
+	cl := UnicodeMap{
+		PtrToSubsetFontObj: o.PtrToSubsetFontObj.clone(f).(*SubsetFontObj),
+		pdfProtection:      o.pdfProtection.Clone(),
+	}
+	return &cl
+}
+
 func (u *UnicodeMap) init(funcGetRoot func() *GoPdf) {
 	//u.getRoot = funcGetRoot
 }

@@ -12,6 +12,13 @@ type CIDFontObj struct {
 	indexObjSubfontDescriptor int
 }
 
+func (o *CIDFontObj) clone(f func() *GoPdf) IObj {
+	cl := CIDFontObj{
+		PtrToSubsetFontObj:        o.PtrToSubsetFontObj.clone(f).(*SubsetFontObj),
+		indexObjSubfontDescriptor: o.indexObjSubfontDescriptor,
+	}
+	return &cl
+}
 func (ci *CIDFontObj) init(funcGetRoot func() *GoPdf) {
 }
 
