@@ -196,11 +196,13 @@ func (gp *GoPdf) Clone() *GoPdf {
 	gpCl.indexEncodingObjFonts = make([]int, len(gp.indexEncodingObjFonts))
 	copy(gpCl.indexEncodingObjFonts, gp.indexEncodingObjFonts)
 	// After cloning, restore *SubsetFontObj sharing across each font group.
+	subFontByCount := make(map[int]*SubsetFontObj, len(gpCl.pdfObjs))
 	for _, obj := range gpCl.pdfObjs {
 		subFont, ok := obj.(*SubsetFontObj)
 		if !ok {
 			continue
 		}
+		subFontByCount[subFont.CountOfFont] = subFont
 		if cidFontObj, ok2 := gpCl.pdfObjs[subFont.indexObjCIDFont].(*CIDFontObj); ok2 {
 			cidFontObj.PtrToSubsetFontObj = subFont
 			if subfontDescObj, ok3 := gpCl.pdfObjs[cidFontObj.indexObjSubfontDescriptor].(*SubfontDescriptorObj); ok3 {
@@ -216,12 +218,8 @@ func (gp *GoPdf) Clone() *GoPdf {
 	}
 	// Rewire curr.FontISubset to the canonical SubsetFontObj in pdfObjs.
 	if gpCl.curr.FontISubset != nil {
-		for _, obj := range gpCl.pdfObjs {
-			if subFont, ok := obj.(*SubsetFontObj); ok &&
-				subFont.CountOfFont == gpCl.curr.FontISubset.CountOfFont {
-				gpCl.curr.FontISubset = subFont
-				break
-			}
+		if subFont, ok := subFontByCount[gpCl.curr.FontISubset.CountOfFont]; ok {
+			gpCl.curr.FontISubset = subFont
 		}
 	}
 	gpCl.indexOfContent = gp.indexOfContent

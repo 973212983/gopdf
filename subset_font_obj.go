@@ -16,7 +16,7 @@ var ErrGlyphNotFound = errors.New("glyph not found")
 
 // SubsetFontObj pdf subsetFont object
 type SubsetFontObj struct {
-	ttfp                  core.TTFParser
+	ttfp                  *core.TTFParser
 	Family                string
 	CharacterToGlyphIndex *MapOfCharacterToGlyphIndex
 	CountOfFont           int
@@ -30,7 +30,7 @@ type SubsetFontObj struct {
 
 func (o SubsetFontObj) clone(f func() *GoPdf) IObj {
 	cl := SubsetFontObj{
-		ttfp:                  o.ttfp.Clone(),
+		ttfp:                  o.ttfp,
 		Family:                o.Family,
 		CharacterToGlyphIndex: o.CharacterToGlyphIndex.Clone(),
 		CountOfFont:           o.CountOfFont,
@@ -46,10 +46,10 @@ func (o SubsetFontObj) clone(f func() *GoPdf) IObj {
 }
 
 func (s *SubsetFontObj) init(funcGetRoot func() *GoPdf) {
+	s.ttfp = &core.TTFParser{}
 	s.CharacterToGlyphIndex = NewMapOfCharacterToGlyphIndex() //make(map[rune]uint)
 	s.funcKernOverride = nil
 	s.funcGetRoot = funcGetRoot
-
 }
 
 func (s *SubsetFontObj) write(w io.Writer, objID int) error {
@@ -120,33 +120,39 @@ func (s *SubsetFontObj) KernValueByLeft(left uint) (bool, *core.KernValue) {
 // SetTTFByPath set ttf
 func (s *SubsetFontObj) SetTTFByPath(ttfpath string) error {
 	useKerning := s.ttfFontOption.UseKerning
-	s.ttfp.SetUseKerning(useKerning)
-	err := s.ttfp.Parse(ttfpath)
+	var parser core.TTFParser
+	parser.SetUseKerning(useKerning)
+	err := parser.Parse(ttfpath)
 	if err != nil {
 		return err
 	}
+	s.ttfp = &parser
 	return nil
 }
 
 // SetTTFByReader set ttf
 func (s *SubsetFontObj) SetTTFByReader(rd io.Reader) error {
 	useKerning := s.ttfFontOption.UseKerning
-	s.ttfp.SetUseKerning(useKerning)
-	err := s.ttfp.ParseByReader(rd)
+	var parser core.TTFParser
+	parser.SetUseKerning(useKerning)
+	err := parser.ParseByReader(rd)
 	if err != nil {
 		return err
 	}
+	s.ttfp = &parser
 	return nil
 }
 
 // SetTTFData set ttf
 func (s *SubsetFontObj) SetTTFData(data []byte) error {
 	useKerning := s.ttfFontOption.UseKerning
-	s.ttfp.SetUseKerning(useKerning)
-	err := s.ttfp.ParseFontData(data)
+	var parser core.TTFParser
+	parser.SetUseKerning(useKerning)
+	err := parser.ParseFontData(data)
 	if err != nil {
 		return err
 	}
+	s.ttfp = &parser
 	return nil
 }
 
@@ -332,7 +338,7 @@ func (s *SubsetFontObj) GlyphIndexToPdfWidth(glyphIndex uint) uint {
 
 // GetTTFParser gets TTFParser.
 func (s *SubsetFontObj) GetTTFParser() *core.TTFParser {
-	return &s.ttfp
+	return s.ttfp
 }
 
 // GetUnderlineThickness underlineThickness.

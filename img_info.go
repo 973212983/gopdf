@@ -25,16 +25,12 @@ func (info imgInfo) Clone() imgInfo {
 		bitsPerComponent: info.bitsPerComponent,
 		filter:           info.filter,
 		decodeParms:      info.decodeParms,
-		trns:             make([]byte, len(info.trns)),
-		smask:            make([]byte, len(info.smask)),
+		trns:             info.trns,
+		smask:            info.smask,
 		smarkObjID:       info.smarkObjID,
-		pal:              make([]byte, len(info.pal)),
+		pal:              info.pal,
 		deviceRGBObjID:   info.deviceRGBObjID,
-		data:             make([]byte, len(info.data)),
+		data:             info.data,
 	}
-	copy(cl.trns, info.trns)
-	copy(cl.smask, info.smask)
-	copy(cl.pal, info.pal)
-	copy(cl.data, info.data)
 	return cl
 }
