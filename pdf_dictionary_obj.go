@@ -60,7 +60,7 @@ func (p *PdfDictionaryObj) write(w io.Writer, objID int) error {
 	zbuff := GetBuffer()
 	defer PutBuffer(zbuff)
 
-	gzipwriter := zlib.NewWriter(zbuff)
+	gzipwriter, err := zlib.NewWriterLevel(zbuff, zlib.BestSpeed)
 	_, err = gzipwriter.Write(b)
 	if err != nil {
 		return err
